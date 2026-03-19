@@ -2,4 +2,11 @@ bin/*
 !bin/.gitkeep
 
 test/*
-!test/.gitkeep
+!test/input/
+!test/output/
+
+test/input/*
+test/output/*
+
+!test/input/.gitkeep
+!test/output/.gitkeep
