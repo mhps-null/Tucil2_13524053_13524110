@@ -71,15 +71,22 @@ bool FileSystem::loadObjFromFile(const std::string &fileName, Mesh &outMesh)
             std::string extra;
             if (ss >> extra)
             {
-                std::cerr << "[ERROR] Format tidak valid! Ditemukan poligon non-segitiga (quadrilateral dsb)\n";
-                std::cerr << "[ERROR] Error di baris " << lineNumber << "\n";
+                std::cerr << "[ERROR] Face bukan segitiga (quadrilateral dsb) di baris " << lineNumber << "\n";
                 return false;
             }
 
             Face f;
-            f.v1 = std::stoi(s1) - 1;
-            f.v2 = std::stoi(s2) - 1;
-            f.v3 = std::stoi(s3) - 1;
+            try
+            {
+                f.v1 = std::stoi(s1) - 1;
+                f.v2 = std::stoi(s2) - 1;
+                f.v3 = std::stoi(s3) - 1;
+            }
+            catch (...)
+            {
+                std::cerr << "[ERROR] Format index face tidak valid di baris " << lineNumber << ": " << line << "\n";
+                return false;
+            }
 
             if (f.v1 < 0 || f.v1 >= outMesh.vertices.size() ||
                 f.v2 < 0 || f.v2 >= outMesh.vertices.size() ||
