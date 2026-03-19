@@ -1,5 +1,5 @@
 bin/*
-!bin/.gitkeep
+!bin/program.exe
 
 test/*
 !test/input/
