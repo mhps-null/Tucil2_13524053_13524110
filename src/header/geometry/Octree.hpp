@@ -1,8 +1,21 @@
 #pragma once
 
-#include "Mesh.hpp"
+#include "geometry/Mesh.hpp"
 
 #include <vector>
+
+struct OctreeStats
+{
+    int numVoxels = 0;
+    std::vector<int> nodesFormed;
+    std::vector<int> nodesPruned;
+
+    OctreeStats(int maxDepth)
+    {
+        nodesFormed.resize(maxDepth + 1, 0);
+        nodesPruned.resize(maxDepth + 1, 0);
+    }
+};
 
 class OctreeNode
 {
@@ -16,7 +29,7 @@ public:
     OctreeNode(const BoundingBox &b, int d);
     ~OctreeNode();
 
-    void build(const Mesh &mesh, int maxDepth, const std::vector<int> &sorroundFaces);
+    void build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces, OctreeStats &stats);
 
 private:
     void subdivide();
@@ -28,6 +41,7 @@ class Octree
 public:
     OctreeNode *root;
     int maxDepth;
+    OctreeStats stats;
 
     Octree(int depth);
     ~Octree();

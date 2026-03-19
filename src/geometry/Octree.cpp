@@ -1,4 +1,4 @@
-#include "Octree.hpp"
+#include "geometry/Octree.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -23,8 +23,10 @@ OctreeNode::~OctreeNode()
     }
 };
 
-void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces)
+void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces, OctreeStats &stats)
 {
+    stats.nodesFormed[depth]++;
+
     for (int faceIdx : surroundFaces)
     {
         if (isIntersectFace(mesh, faceIdx))
@@ -36,12 +38,14 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
     if (faceIndices.empty())
     {
         isLeaf = true;
+        stats.nodesPruned[depth]++;
         return;
     }
 
     if (depth == maxDepth)
     {
         isLeaf = true;
+        stats.numVoxels++;
         return;
     }
 
@@ -50,7 +54,7 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
 
     for (int i = 0; i < 8; i++)
     {
-        children[i]->build(mesh, maxDepth, this->faceIndices);
+        children[i]->build(mesh, maxDepth, this->faceIndices, stats);
     }
 
     faceIndices.clear();
@@ -296,7 +300,7 @@ bool OctreeNode::isIntersectFace(const Mesh &mesh, int faceIndex) const
     return true;
 };
 
-Octree::Octree(int depth) : root(nullptr), maxDepth(depth) {};
+Octree::Octree(int depth) : root(nullptr), maxDepth(depth > 0 ? depth : 0), stats{depth > 0 ? depth : 0} {};
 
 Octree::~Octree()
 {
@@ -314,6 +318,10 @@ void Octree::buildTree(const Mesh &mesh)
         delete root;
         root = nullptr;
     }
+
+    stats.numVoxels = 0;
+    std::fill(stats.nodesFormed.begin(), stats.nodesFormed.end(), 0);
+    std::fill(stats.nodesPruned.begin(), stats.nodesPruned.end(), 0);
 
     BoundingBox sceneBox = mesh.findBoundingBox();
 
@@ -334,5 +342,5 @@ void Octree::buildTree(const Mesh &mesh)
         allFaces.push_back(i);
     }
 
-    root->build(mesh, maxDepth, allFaces);
+    root->build(mesh, maxDepth, allFaces, this->stats);
 };
