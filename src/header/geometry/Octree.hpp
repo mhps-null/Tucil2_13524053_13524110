@@ -3,6 +3,7 @@
 #include "geometry/Mesh.hpp"
 
 #include <vector>
+#include <mutex> // agar tidak race condition
 
 struct OctreeStats
 {
@@ -10,10 +11,30 @@ struct OctreeStats
     std::vector<int> nodesFormed;
     std::vector<int> nodesPruned;
 
+    std::mutex statsMutex;
+
     OctreeStats(int maxDepth)
     {
         nodesFormed.resize(maxDepth + 1, 0);
         nodesPruned.resize(maxDepth + 1, 0);
+    }
+
+    void addVoxel()
+    {
+        std::lock_guard<std::mutex> lock(statsMutex);
+        numVoxels++;
+    }
+
+    void addNodePruned(int depth)
+    {
+        std::lock_guard<std::mutex> lock(statsMutex);
+        nodesPruned[depth]++;
+    }
+
+    void addNodeFormed(int depth)
+    {
+        std::lock_guard<std::mutex> lock(statsMutex);
+        nodesFormed[depth]++;
     }
 };
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <future> // asynchronus
 
 OctreeNode::OctreeNode(const BoundingBox &b, int d) : box(b), depth(d), isLeaf(false)
 {
@@ -25,7 +26,7 @@ OctreeNode::~OctreeNode()
 
 void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces, OctreeStats &stats)
 {
-    stats.nodesFormed[depth]++;
+    stats.addNodeFormed(this->depth);
 
     for (int faceIdx : surroundFaces)
     {
@@ -38,23 +39,41 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
     if (faceIndices.empty())
     {
         isLeaf = true;
-        stats.nodesPruned[depth]++;
+        stats.addNodePruned(this->depth);
         return;
     }
 
     if (depth == maxDepth)
     {
         isLeaf = true;
-        stats.numVoxels++;
+        stats.addVoxel();
         return;
     }
 
     isLeaf = false;
     subdivide();
 
-    for (int i = 0; i < 8; i++)
+    if (this->depth < 2) // batasi concurrency maksimal depth 3, agar tidak overhead
     {
-        children[i]->build(mesh, maxDepth, this->faceIndices, stats);
+        std::vector<std::future<void>> futures;
+
+        for (int i = 0; i < 8; i++)
+        {
+            futures.push_back(std::async(std::launch::async, [&, i]()
+                                         { children[i]->build(mesh, maxDepth, this->faceIndices, stats); }));
+        }
+
+        for (auto &f : futures)
+        {
+            f.get();
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            children[i]->build(mesh, maxDepth, this->faceIndices, stats);
+        }
     }
 
     faceIndices.clear();
