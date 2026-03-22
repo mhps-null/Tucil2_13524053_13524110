@@ -28,6 +28,8 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
 {
     stats.addNodeFormed(this->depth);
 
+    faceIndices.clear();
+
     for (int faceIdx : surroundFaces)
     {
         if (isIntersectFace(mesh, faceIdx))
@@ -53,6 +55,22 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
     isLeaf = false;
     subdivide();
 
+    std::vector<int> childBuckets[8];
+    for (int i = 0; i < 8; i++)
+    {
+        childBuckets[i].reserve(faceIndices.size() / 4);
+    }
+    for (int faceIdx : faceIndices)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            if (children[i]->isIntersectFace(mesh, faceIdx))
+            {
+                childBuckets[i].push_back(faceIdx);
+            }
+        }
+    }
+
     if (this->depth < 2) // batasi concurrency maksimal depth 3, agar tidak overhead
     {
         std::vector<std::future<void>> futures;
@@ -60,7 +78,7 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
         for (int i = 0; i < 8; i++)
         {
             futures.push_back(std::async(std::launch::async, [&, i]()
-                                         { children[i]->build(mesh, maxDepth, this->faceIndices, stats); }));
+                                         { children[i]->build(mesh, maxDepth, childBuckets[i], stats); }));
         }
 
         for (auto &f : futures)
@@ -72,7 +90,7 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
     {
         for (int i = 0; i < 8; i++)
         {
-            children[i]->build(mesh, maxDepth, this->faceIndices, stats);
+            children[i]->build(mesh, maxDepth, childBuckets[i], stats);
         }
     }
 
