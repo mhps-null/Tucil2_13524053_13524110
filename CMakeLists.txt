@@ -17,3 +17,7 @@ add_executable(program
 )
 
 target_include_directories(program PRIVATE src/header)
+
+# find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
+# add_executable()
+# target_link_libraries(sfml-graphics sfml-window sfml-system)

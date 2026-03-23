@@ -19,7 +19,6 @@ struct BoundingBox
     Vertex min, max;
 };
 
-
 /*
  *  ADT untuk Object Viewer (Camera) sederhana.
  */
@@ -27,6 +26,11 @@ struct BoundingBox
 struct Camera {
    double x, y, z;
    double angleX, angleY, angleZ;
+};
+
+struct Coordinates
+{
+    float x, y;
 };
 
 struct ScreenData {

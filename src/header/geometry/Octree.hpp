@@ -2,18 +2,23 @@
 
 #include "geometry/Mesh.hpp"
 
+#include <atomic>
 #include <vector>
+
+class ThreadPool;
 
 struct OctreeStats
 {
-    int numVoxels = 0;
-    std::vector<int> nodesFormed;
-    std::vector<int> nodesPruned;
+    std::atomic<int> numVoxels = 0;
+    std::vector<std::atomic<int>> nodesFormed;
+    std::vector<std::atomic<int>> nodesPruned;
 
-    OctreeStats(int maxDepth)
+     OctreeStats(int maxDepth): nodesFormed(maxDepth + 1), nodesPruned(maxDepth + 1)
     {
-        nodesFormed.resize(maxDepth + 1, 0);
-        nodesPruned.resize(maxDepth + 1, 0);
+        for (int i = 0; i <= maxDepth; i++) {
+            nodesFormed[i].store(0, std::memory_order_relaxed);
+            nodesPruned[i].store(0, std::memory_order_relaxed);
+        }
     }
 };
 
@@ -29,7 +34,7 @@ public:
     OctreeNode(const BoundingBox &b, int d);
     ~OctreeNode();
 
-    void build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces, OctreeStats &stats);
+    void build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces, OctreeStats &stats, ThreadPool *threadPool);
 
 private:
     void subdivide();

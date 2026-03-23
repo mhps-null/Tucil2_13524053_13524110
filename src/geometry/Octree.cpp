@@ -1,7 +1,12 @@
 #include "geometry/Octree.hpp"
+#include "utils/ThreadPool.hpp"
 
 #include <algorithm>
 #include <cmath>
+
+// concurrency + parallelism library
+#include <future>
+#include <atomic>
 
 OctreeNode::OctreeNode(const BoundingBox &b, int d) : box(b), depth(d), isLeaf(false)
 {
@@ -23,9 +28,9 @@ OctreeNode::~OctreeNode()
     }
 };
 
-void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces, OctreeStats &stats)
+void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &surroundFaces, OctreeStats &stats, ThreadPool* threadPool)
 {
-    stats.nodesFormed[depth]++;
+    stats.nodesFormed[depth].fetch_add(1, std::memory_order_relaxed);
 
     for (int faceIdx : surroundFaces)
     {
@@ -38,23 +43,41 @@ void OctreeNode::build(const Mesh &mesh, int maxDepth, const std::vector<int> &s
     if (faceIndices.empty())
     {
         isLeaf = true;
-        stats.nodesPruned[depth]++;
+        stats.nodesPruned[depth].fetch_add(1, std::memory_order_relaxed);
         return;
     }
 
     if (depth == maxDepth)
     {
         isLeaf = true;
-        stats.numVoxels++;
+        stats.numVoxels.fetch_add(1, std::memory_order_relaxed);
         return;
     }
 
     isLeaf = false;
     subdivide();
 
-    for (int i = 0; i < 8; i++)
+    if (depth < 2 && faceIndices.size() > 1000){
+        std::vector<std::future<void>> tasks;
+
+        for (int i = 0; i < 8; i++)
+        {
+            tasks.push_back(threadPool->enqueue([this, &mesh, &stats, maxDepth, i, threadPool]() {
+                children[i]->build(mesh, maxDepth, this->faceIndices, stats, threadPool);
+            }));
+        }
+
+        for (auto &t : tasks)
+        {
+            t.get();
+        }
+    }
+    else
     {
-        children[i]->build(mesh, maxDepth, this->faceIndices, stats);
+        for (int i = 0; i < 8; i++)
+        {
+            children[i]->build(mesh, maxDepth, this->faceIndices, stats, threadPool);
+        }
     }
 
     faceIndices.clear();
@@ -319,9 +342,12 @@ void Octree::buildTree(const Mesh &mesh)
         root = nullptr;
     }
 
-    stats.numVoxels = 0;
-    std::fill(stats.nodesFormed.begin(), stats.nodesFormed.end(), 0);
-    std::fill(stats.nodesPruned.begin(), stats.nodesPruned.end(), 0);
+    stats.numVoxels.store(0, std::memory_order_relaxed);
+
+    for (int i = 0; i <= maxDepth; i++) {
+        stats.nodesFormed[i].store(0, std::memory_order_relaxed);
+        stats.nodesPruned[i].store(0, std::memory_order_relaxed);
+    }
 
     BoundingBox sceneBox = mesh.findBoundingBox();
 
@@ -341,6 +367,14 @@ void Octree::buildTree(const Mesh &mesh)
     {
         allFaces.push_back(i);
     }
+    
+    unsigned threadCount = std::thread::hardware_concurrency();
+    if (threadCount == 0)
+    {
+        threadCount = 4;
+    }
 
-    root->build(mesh, maxDepth, allFaces, this->stats);
+    ThreadPool threadPool(threadCount);
+
+    root->build(mesh, maxDepth, allFaces, this->stats, &threadPool);
 };

@@ -53,20 +53,20 @@ int main(int argc, char *argv[])
     std::chrono::duration<double, std::milli> elapsed_ms = end_time - start_time;
 
     std::cout << "\nOutput:\n";
-    std::cout << "Banyak voxel yang terbentuk: " << octree.stats.numVoxels << "\n";
+    std::cout << "Banyak voxel yang terbentuk: " << octree.stats.numVoxels.load(std::memory_order_relaxed) << "\n";
     std::cout << "Banyak vertex yang terbentuk: " << voxelVerticesCount << "\n";
     std::cout << "Banyak faces yang terbentuk: " << voxelFacesCount << "\n";
 
     std::cout << "\nStatistik node octree yang terbentuk:\n";
     for (int i = 1; i <= maxDepth; i++)
     {
-        std::cout << i << " : " << octree.stats.nodesFormed[i] << "\n";
+        std::cout << i << " : " << octree.stats.nodesFormed[i].load(std::memory_order_relaxed) << "\n";
     }
 
     std::cout << "\nStatistik node yang tidak perlu ditelusuri:\n";
     for (int i = 1; i <= maxDepth; i++)
     {
-        std::cout << i << " : " << octree.stats.nodesPruned[i] << "\n";
+        std::cout << i << " : " << octree.stats.nodesPruned[i].load(std::memory_order_relaxed) << "\n";
     }
 
     std::cout << "\nKedalaman octree: " << maxDepth << "\n";
