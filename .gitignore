@@ -3,8 +3,8 @@ build/
 bin/*
 !bin/windows
 !bin/wsl-linux
-!bin/voxelizer.exe
-!bin/voxelizer
+!bin/windows/voxelizer.exe
+!bin/wsl-linux/voxelizer
 
 test/*
 !test/input/
