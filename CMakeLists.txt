@@ -9,14 +9,14 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_executable(program
+add_executable(voxelizer
     src/main.cpp
     src/geometry/Octree.cpp
     src/geometry/Mesh.cpp
     src/filesystem/FileSystem.cpp
 )
 
-target_include_directories(program PRIVATE src/header)
+target_include_directories(voxelizer PRIVATE src/header)
 
 # find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 # add_executable()
