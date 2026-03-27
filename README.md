@@ -118,6 +118,7 @@ cd build
 - File `.obj` harus berada di folder `test/input/`
 - Output voxel akan disimpan di `test/output/`
 - Binary pada folder `bin` bersifat platform-dependent
+- Hanya menerima file `.obj` dengan mesh berbentuk **segitiga (triangular faces)**; face dengan lebih dari 3 vertex tidak didukung
 
 ---
 
