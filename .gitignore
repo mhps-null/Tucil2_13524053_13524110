@@ -15,3 +15,4 @@ test/output/*
 
 !test/input/.gitkeep
 !test/output/.gitkeep
+!test/output/test_case.zip
