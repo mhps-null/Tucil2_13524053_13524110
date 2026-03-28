@@ -16,8 +16,6 @@ add_executable(voxelizer
     src/geometry/Octree.cpp
     src/geometry/Mesh.cpp
     src/filesystem/FileSystem.cpp
-    # src/objectviewer/CameraLogic.cpp
-    # src/objectviewer/Viewer.cpp
 )
 
 add_executable(viewer

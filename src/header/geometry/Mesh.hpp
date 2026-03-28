@@ -4,6 +4,8 @@
 
 #include <vector>
 
+using namespace geometry;
+
 class Mesh
 {
 public:
