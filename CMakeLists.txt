@@ -11,13 +11,11 @@ endif()
 
 find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 
-add_executable(program
+add_executable(voxelizer
     src/main.cpp
     src/geometry/Octree.cpp
     src/geometry/Mesh.cpp
     src/filesystem/FileSystem.cpp
-    # src/objectviewer/CameraLogic.cpp
-    # src/objectviewer/Viewer.cpp
 )
 
 add_executable(viewer
@@ -27,7 +25,7 @@ add_executable(viewer
     src/filesystem/FileSystem.cpp
 )
 
-target_include_directories(program PRIVATE src/header)
+target_include_directories(voxelizer PRIVATE src/header)
 target_include_directories(viewer PRIVATE src/header)
 
 target_link_libraries(viewer PRIVATE sfml-graphics sfml-window sfml-system)
