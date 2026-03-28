@@ -2,6 +2,8 @@
 
 > Tugas Kecil 2 IF2211 Strategi Algoritma
 
+<p align="center"> <img src="doc/preview.png" width="60%"/> </p>
+
 ## Deskripsi Singkat
 
 Program ini melakukan voxelization terhadap model 3D berbasis struktur data **octree**. Program membaca file `.obj` dari folder `test/input`, kemudian membagi ruang menjadi voxel berdasarkan parameter **max depth**, dan menyimpan hasilnya ke folder `test/output`.
@@ -20,6 +22,21 @@ Program juga menyediakan visualisasi objek menggunakan SFML.
 
 - GCC 13.3.0 (Linux / WSL)
 - MinGW GCC 15.2.0 (Windows)
+
+---
+
+## Instalasi Dependency
+
+**Linux (Ubuntu/Debian):**
+
+```bash
+sudo apt install libsfml-dev
+```
+
+**Windows:**
+
+- Install SFML (manual atau vcpkg)
+- Pastikan SFML_DIR terdeteksi oleh CMake
 
 ---
 
@@ -81,6 +98,14 @@ cd build
 ```powershell
 .\voxelizer.exe <namafile>.obj <maxdepth>
 ```
+
+---
+
+## Kontrol Visualisasi (SFML)
+
+- Mouse Kiri / Drag: Memutar kamera objek.
+- Scroll Wheel: Zoom-in / Zoom-out.
+- W/A/S/D: Gerakan kamera (W: naik, A: kiri, S: turun, D: kanan)
 
 ---
 
