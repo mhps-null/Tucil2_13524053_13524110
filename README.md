@@ -2,10 +2,6 @@
 
 > Tugas Kecil 2 IF2211 Strategi Algoritma
 
-<!-- <p align="center">
-  <img src="doc/preview.png" width="60%"/>
-</p> -->
-
 ## Deskripsi Singkat
 
 Program ini melakukan voxelization terhadap model 3D berbasis struktur data **octree**. Program membaca file `.obj` dari folder `test/input`, kemudian membagi ruang menjadi voxel berdasarkan parameter **max depth**, dan menyimpan hasilnya ke folder `test/output`.
@@ -18,7 +14,7 @@ Program juga menyediakan visualisasi objek menggunakan SFML.
 
 - CMake >= 3.10
 - C++17 compatible compiler
-- SFML >= 2.5 (components: graphics, window, system)
+- SFML >= 2.5 dan maksimal 2.x (tidak mendukung versi 3.x atau 1.x)
 
 ### Tested on
 
@@ -27,33 +23,17 @@ Program juga menyediakan visualisasi objek menggunakan SFML.
 
 ---
 
-<!-- ## Instalasi Dependency
-
-**Linux (Ubuntu/Debian):**
-
-```bash
-sudo apt install libsfml-dev
-```
-
-**Windows:**
-
-* Install SFML (manual atau vcpkg)
-* Pastikan `SFML_DIR` terdeteksi oleh CMake
-
---- -->
-
 ## Quick Start (Recommended)
 
 Gunakan executable yang sudah disediakan.
 
 ```bash
-cd bin/<platform>
+cd bin
 ```
 
 **Linux / WSL:**
 
 ```bash
-cd bin/wsl-linux
 ./voxelizer <namafile>.obj <maxdepth>
 
 # Contoh:
@@ -63,7 +43,6 @@ cd bin/wsl-linux
 **Windows (PowerShell):**
 
 ```powershell
-cd bin/windows
 .\voxelizer.exe <namafile>.obj <maxdepth>
 
 # Contoh:
@@ -103,21 +82,13 @@ cd build
 .\voxelizer.exe <namafile>.obj <maxdepth>
 ```
 
-<!-- ---
-
-## Kontrol Visualisasi (SFML)
-
-- Mouse Kiri / Drag: Memutar kamera objek.
-- Scroll Wheel: Zoom-in / Zoom-out.
-- Tombol ESC: Menutup jendela visualisasi. -->
-
 ---
 
 ## Catatan
 
 - File `.obj` harus berada di folder `test/input/`
 - Output voxel akan disimpan di `test/output/`
-- Binary pada folder `bin` bersifat platform-dependent
+- Program harus dijalankan dari folder `bin/` atau `build/` agar path relatif bekerja dengan benar
 - Hanya menerima file `.obj` dengan mesh berbentuk **segitiga (triangular faces)**; face dengan lebih dari 3 vertex tidak didukung
 
 ---
