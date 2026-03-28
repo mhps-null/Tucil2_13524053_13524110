@@ -1,5 +1,10 @@
+build/
+
 bin/*
-!bin/program.exe
+!bin/windows
+!bin/wsl-linux
+!bin/windows/voxelizer.exe
+!bin/wsl-linux/voxelizer
 
 test/*
 !test/input/
