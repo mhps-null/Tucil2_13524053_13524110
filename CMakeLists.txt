@@ -9,15 +9,25 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
+
 add_executable(voxelizer
     src/main.cpp
     src/geometry/Octree.cpp
     src/geometry/Mesh.cpp
     src/filesystem/FileSystem.cpp
+    # src/objectviewer/CameraLogic.cpp
+    # src/objectviewer/Viewer.cpp
+)
+
+add_executable(viewer
+    src/objectviewer/CameraLogic.cpp
+    src/objectviewer/Viewer.cpp
+    src/geometry/Mesh.cpp
+    src/filesystem/FileSystem.cpp
 )
 
 target_include_directories(voxelizer PRIVATE src/header)
+target_include_directories(viewer PRIVATE src/header)
 
-# find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
-# add_executable()
-# target_link_libraries(sfml-graphics sfml-window sfml-system)
+target_link_libraries(viewer PRIVATE sfml-graphics sfml-window sfml-system)
