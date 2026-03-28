@@ -20,6 +20,7 @@ Program juga menyediakan visualisasi objek menggunakan SFML.
 
 ### Tested on
 
+- CMake 4.1.2
 - GCC 13.3.0 (Linux / WSL)
 - MinGW GCC 15.2.0 (Windows)
 - SFML 2.6.1
