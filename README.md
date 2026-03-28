@@ -68,7 +68,8 @@ cd bin
 
 ## Command Object Viewer
 
-Program juga menyediakan command untuk langsung membuka visualisasi file `.obj`.
+- Jalankan dari folder `bin/` atau `build/`.
+- Viewer dapat digunakan untuk membuka file input (.obj asli) maupun hasil voxelisasi.
 
 **Linux / WSL:**
 
@@ -77,17 +78,17 @@ Program juga menyediakan command untuk langsung membuka visualisasi file `.obj`.
 
 # Contoh:
 ./viewer input/teapot.obj
-./viewer output/teapot_voxel.obj
+./viewer output/voxelized_teapot.obj
 ```
 
 **Windows (PowerShell):**
 
-```bash
+```powershell
 .\viewer.exe <output/input>\<nama_file>.obj
 
 # Contoh:
 .\viewer.exe input\teapot.obj
-.\viewer.exe output\teapot_voxel.obj
+.\viewer.exe output\voxelized_teapot.obj
 ```
 
 ---
