@@ -66,6 +66,30 @@ cd bin
 .\voxelizer.exe cow.obj 6
 ```
 
+## Command Object Viewer
+
+Program juga menyediakan command untuk langsung membuka visualisasi file `.obj`.
+
+**Linux / WSL:**
+
+```bash
+./viewer <output/input>/<nama_file>.obj
+
+# Contoh:
+./viewer input/teapot.obj
+./viewer output/teapot_voxel.obj
+```
+
+**Windows (PowerShell):**
+
+```bash
+.\viewer.exe <output/input>\<nama_file>.obj
+
+# Contoh:
+.\viewer.exe input\teapot.obj
+.\viewer.exe output\teapot_voxel.obj
+```
+
 ---
 
 ## Cara Kompilasi (Opsional)
