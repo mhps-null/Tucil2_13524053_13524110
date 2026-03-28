@@ -5,6 +5,8 @@
 #include <atomic>
 #include <vector>
 
+using namespace geometry;
+
 class ThreadPool;
 
 struct OctreeStats

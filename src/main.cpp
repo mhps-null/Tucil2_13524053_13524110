@@ -32,7 +32,9 @@ int main(int argc, char *argv[])
     Mesh mesh;
     std::cout << "Membaca file " << fileName << "...\n";
 
-    if (!FileSystem::loadObjFromFile(fileName, mesh))
+    std::string inputPath = "input/" + fileName;
+
+    if (!FileSystem::loadObjFromFile(inputPath, mesh))
     {
         std::cerr << "[ERROR] Gagal memuat file. Program berhenti.\n";
         return 1;
@@ -72,6 +74,6 @@ int main(int argc, char *argv[])
     std::cout << "\nKedalaman octree: " << maxDepth << "\n";
     std::cout << "Lama waktu program berjalan: " << elapsed_ms.count() << " ms\n";
     std::cout << "Path dimana file .obj disimpan: test/output/" << fileName << "\n";
-
+    
     return 0;
 }

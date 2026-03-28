@@ -9,7 +9,7 @@ bool FileSystem::loadObjFromFile(const std::string &fileName, Mesh &outMesh)
 {
     std::filesystem::path filePath =
         std::filesystem::weakly_canonical(
-            std::filesystem::current_path() / "../test/input" / fileName);
+            std::filesystem::current_path() / "../test" / fileName);
 
     if (!(std::filesystem::exists(filePath)))
     {

@@ -16,96 +16,88 @@
 using namespace std;
 
 
-// Based on geeksforgeeks.org
-class ThreadPool
-{
-public:
-    ThreadPool(size_t threadCount) : stop_(false)
-    {
-        // workers thread
-        for (size_t i = 0; i < threadCount; ++i)
-        {
-            workers.emplace_back([this]() {
-                while (true)
-                {
-                    function<void()> task;
-                    {
-                        // lock queue biar data bisa diakses dengan kebersamaan (bruh)
-                        unique_lock<mutex> lock(queueMutex);
-                        condition_.wait(lock, [this]() {
-                            return stop_ || !tasks_.empty();
-                        });
-                        
+// Based on geeksforgeeks.org/thread-pool-in-cpp/
 
-                        // thread exit kalau stop true dan tidak ada task lainnya
-                        if (stop_ && tasks_.empty())
+class ThreadPool {
+    public:
+        ThreadPool(size_t threadCount) : stop_(false) {
+            // workers thread
+            for (size_t i = 0; i < threadCount; ++i) {
+                workers.emplace_back([this](){
+                    while (true)
+                    {
+                        function<void()> task;
                         {
-                            return;
+                            // lock queue biar data bisa diakses dengan kebersamaan (bruh)
+                            unique_lock<mutex> lock(queueMutex);
+                            condition_.wait(lock, [this](){
+                                return stop_ || !tasks_.empty();
+                            });
+                            
+
+                            // thread exit kalau stop true dan tidak ada task lainnya
+                            if (stop_ && tasks_.empty()) {
+                                return;
+                            }
+
+                            task = move(tasks_.front());
+                            tasks_.pop();
                         }
 
-                        task = move(tasks_.front());
-                        tasks_.pop();
+                        task();
                     }
-
-                    task();
-                }
-            });
-        }
-    }
-
-    ~ThreadPool()
-    {
-        {
-            // lock queue
-            unique_lock<mutex> lock(queueMutex);
-            stop_ = true;
+                });
+            }
         }
 
-        condition_.notify_all();
-
-        for (auto &worker : workers)
+        ~ThreadPool()
         {
-            worker.join();
-        }
-    }
-
-    // thread pool queue
-    template <class F>
-    auto enqueue(F&& f) -> future<typename invoke_result<F>::type>
-    {
-        // memperhatikan tipe yang dibalikkin
-        using ReturnType = typename invoke_result<F>::type;
-
-        auto taskPtr = make_shared<packaged_task<ReturnType()>>(
-            forward<F>(f)
-        );
-
-        future<ReturnType> result = taskPtr->get_future();
-
-        {
-            // lock biar tidak saling nimpa data
-            lock_guard<mutex> lock(queueMutex);
-            
-            // ts error handling biasa
-            if (stop_)
             {
-                throw runtime_error("[RTE] enqueue on stopped.");
+                // lock queue
+                unique_lock<mutex> lock(queueMutex);
+                stop_ = true;
             }
 
-            tasks_.emplace([taskPtr]() {
-                (*taskPtr)();
-            });
+            condition_.notify_all();
+
+            for (auto &worker : workers) {
+                worker.join();
+            }
         }
 
-        condition_.notify_one();
-        return result;
-    }
+        // thread pool queue
+        template <class F>
+        auto enqueue(F&& f) -> future<typename invoke_result<F>::type> {
+            // memperhatikan tipe yang dibalikkin
+            using ReturnType = typename invoke_result<F>::type;
 
-private:
-    vector<thread> workers;
-    queue<function<void()>> tasks_;
+            auto taskPtr = make_shared<packaged_task<ReturnType()>>(forward<F>(f));
 
-    mutex queueMutex;
-    condition_variable condition_;
-    bool stop_;
+            future<ReturnType> result = taskPtr->get_future();
+
+            {
+                // lock biar tidak saling nimpa data
+                lock_guard<mutex> lock(queueMutex);
+                
+                // ts error handling biasa
+                if (stop_) {
+                    throw runtime_error("[RTE] enqueue on stopped.");
+                }
+
+                tasks_.emplace([taskPtr]() {
+                    (*taskPtr)();
+                });
+            }
+
+            condition_.notify_one();
+            return result;
+        }
+
+    private:
+        vector<thread> workers;
+        queue<function<void()>> tasks_;
+
+        mutex queueMutex;
+        condition_variable condition_;
+        bool stop_;
 };

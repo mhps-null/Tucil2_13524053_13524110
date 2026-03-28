@@ -4,6 +4,7 @@
 
 #include "geometry/Octree.hpp"
 #include "geometry/Mesh.hpp"
+using namespace geometry;
 
 class FileSystem
 {
